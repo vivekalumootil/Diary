@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+
+from datetime import date
+import argparse
+import sys
+import os
+
+# Parse Input
+
+def parse(argv):
+    parser = argparse.ArgumentParser(description="Process input")
+    parser.add_argument('-d', '--decode', action='store_true')
+    parser.add_argument('-n', '--name', type=str, required=True)
+    args = parser.parse_args(argv)
+    print(args)
+
+def prompt():
+    print("You have three options. You may (1) read an entry, (2) add a new entry, (3) delete an entry or (4) cleanse the entire system.")
+    print("Option: ", end = "")
+    choice = int(input())
+
+    # Read through choices
+    if (choice == 1):
+        print("Please enter the date (day-month-year) of the entry you would like to read")
+        print("Date: ", end = "")
+        dt = input() + '.out.txt'
+        files = [f for f in os.listdir('./entries/') if os.path.isfile('./entries/' + f)]
+        if (dt in files):
+            print("You will be prompted for the encryption password")
+            os.system('touch temp')
+            os.system('openssl enc -d -aes-256-cbc -in %s -out %s' % ('./entries/' + dt, 'temp'))
+            with open('temp', 'r') as fi:
+                print("######################################")
+                print(fi.read()) 
+                print("######################################")
+            os.system('rm temp')
+        else:
+            print("Sorry, we cannot find this entry.")
+
+    if (choice == 2):
+        print("Please enter the date (day-month-year) of the entry you would like to add. Note the file name should be this + .txt.")
+        print("Date: ", end = "")
+        dt = input()
+        files = [f for f in os.listdir('./entries/') if os.path.isfile('./entries/' + f)]
+        if ((dt+'.out.txt') in files):
+            print("Sorry, this file already exists.")
+        else:
+            print("You will be prompted for your encryption password. Write this down.")
+            os.system('touch %s' % (dt + '.out.txt'))
+            os.system('openssl enc -aes-256-cbc -in %s -out %s' % (dt + '.txt', dt + '.out.txt'))
+            os.system('mv %s entries' % (dt + '.out.txt'))
+            os.system('rm %s' % (dt + '.txt'))
+            print("Entry succesfully added")
+
+    # Add security check to deletion
+    if (choice == 3):
+        print("Please enter the date (day-month-year) of the entry you would like to delete")
+        print("Date: ", end = "")
+        dt = input() + '.out.txt'
+        files = [f for f in os.listdir('./entries/') if os.path.isfile('./entries/' + f)]
+        if (dt in files):
+            print("Are you absolutely sure you would like to delete this entry? This action cannot be reversed!")
+            print("Type yes or no: ", end = "")
+            truth = input()
+            if (truth == 'yes'):
+                os.system('rm ./entries/%s' % (dt))
+                print("%s has been deleted" % (dt))
+            else:
+                print("Deletion aborted") 
+        else:
+            print("Sorry, we cannot find this entry.")
+
+    # Add security check to cleansing
+    if (choice == 4):
+        print("Are you absolutely sure you would like to delete all entries? This action cannot be reversed!")
+        print("Type yes or no: ", end = "")
+        truth = input()
+        if (truth == 'yes'):
+            files = [f for f in os.listdir('./entries/') if os.path.isfile('./entries/' + f)]
+            for f in files:
+                if (f[:-7] == 'out.txt'):
+                    os.system('rm %s' % (f))
+            print("System cleansed")
+        else:
+            print("Cleansing aborted")
+ 
+if __name__ == "__main__":
+    # Introduction statements 
+    print("######################################")
+    print("WELCOME TO DIARY \n")
+    today = date.today()
+    print("Today's date is %s" % (today))
+
+    while (True):
+        prompt()
+    print("Have a good day!")

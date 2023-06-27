@@ -1,0 +1,4 @@
+6/15/23: Completed most of 4BL Lab Report, learned a bit about bash scripting and OpenSSL, created this diary interface
+6/16/23: Created a personal website by myself with html and css, learned the basics of Flask, and added blog to website. Then accidentally deleted website...
+6/17/23: Learned a bit about Swift
+6/18/23: Recreated personal website.
