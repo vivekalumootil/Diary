@@ -4,33 +4,50 @@ from datetime import date
 import sys
 import os
 
-def prompt():
-    print("You have three options. You may (1) read an entry, (2) add a new entry, (3) delete an entry or (4) cleanse the entire system.")
-    print("Option: ", end = "")
-    choice = int(input())
+def day_month_year(s):
+    arr = s.split('-')
+    months = ['January','February','March','April','May','June','July','August','September','October','November','December']
+    date_string = months[int(arr[1])-1] + ' ' + str(arr[0]) + 'th, ' + str(arr[2])
+    return date_string    
 
+def dash_year(s):
+    months = ['January','February','March','April','May','June','July','August','September','October','November','December']
+    arr = s.split(' ')
+    m = months.index(arr[0]) + 1
+    day = arr[1][:-3]
+    year = arr[2]
+    return day + '-' + str(m) + '-' + year  
+        
+def prompt():
+    print("You have three options. You may (1) read an entry, (2) add a new entry, (3) see the dates of all current entries, (4) delete an entry, (5) cleanse the entire system or (6) exit")
+    print("Option: ", end="")
+    choice = int(input())
+    print("")
     # Read through choices
     if (choice == 1):
-        print("Please enter the date (day-month-year) of the entry you would like to read")
+        print("Please enter the date (Month Day(th), Year) of the entry you would like to read")
         print("Date: ", end = "")
-        dt = input() + '.out.txt'
+        dt = input() 
+        dt = dash_year(dt) + '.out.txt'
         files = [f for f in os.listdir('./entries/') if os.path.isfile('./entries/' + f)]
         if (dt in files):
             print("You will be prompted for the encryption password")
             os.system('touch temp')
             os.system('openssl enc -d -aes-256-cbc -in %s -out %s' % ('./entries/' + dt, 'temp'))
             with open('temp', 'r') as fi:
-                print("######################################")
-                print(fi.read()) 
-                print("######################################")
+                print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n")
+                print(fi.read())
+                print("") 
+                print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             os.system('rm temp')
         else:
             print("Sorry, we cannot find this entry.")
 
     if (choice == 2):
-        print("Please enter the date (day-month-year) of the entry you would like to add. Note the file name should be this + .txt.")
+        print("Please enter the date (Month Day(th), Year) of the entry you would like to add. Note the file name should be this + .txt.")
         print("Date: ", end = "")
         dt = input()
+        dt = dash_year(dt)
         files = [f for f in os.listdir('./entries/') if os.path.isfile('./entries/' + f)]
         if ((dt+'.out.txt') in files):
             print("Sorry, this file already exists.")
@@ -42,11 +59,19 @@ def prompt():
             os.system('rm %s' % (dt + '.txt'))
             print("Entry succesfully added")
 
-    # Add security check to deletion
     if (choice == 3):
-        print("Please enter the date (day-month-year) of the entry you would like to delete")
+        print("Here are the dates of all available journal entries:")
+        files = [f for f in os.listdir('./entries/') if os.path.isfile('./entries/' + f)]
+        for f in files:
+            if (f[-7:] == 'out.txt'):
+                print(day_month_year(f[:-8]))
+
+    # Add security check to deletion
+    if (choice == 4):
+        print("Please enter the date (Month Day(th), Year) of the entry you would like to delete")
         print("Date: ", end = "")
-        dt = input() + '.out.txt'
+        dt = input()
+        dt = dash_year(dt) + '.out.txt'
         files = [f for f in os.listdir('./entries/') if os.path.isfile('./entries/' + f)]
         if (dt in files):
             print("Are you absolutely sure you would like to delete this entry? This action cannot be reversed!")
@@ -61,26 +86,34 @@ def prompt():
             print("Sorry, we cannot find this entry.")
 
     # Add security check to cleansing
-    if (choice == 4):
+    if (choice == 5):
         print("Are you absolutely sure you would like to delete all entries? This action cannot be reversed!")
         print("Type yes or no: ", end = "")
         truth = input()
         if (truth == 'yes'):
             files = [f for f in os.listdir('./entries/') if os.path.isfile('./entries/' + f)]
             for f in files:
-                if (f[:-7] == 'out.txt'):
+                if (f[-7:] == 'out.txt'):
                     os.system('rm %s' % (f))
             print("System cleansed")
         else:
             print("Cleansing aborted")
+    
+    if (choice == 6):
+        return False
+    else:
+        return True
  
 if __name__ == "__main__":
     # Introduction statements 
-    print("######################################")
+    print("###################################### \n")
     print("WELCOME TO DIARY \n")
     today = date.today()
-    print("Today's date is %s" % (today))
-
-    while (True):
-        prompt()
+    print("Today's date is %s \n" % (today))
+    print("###################################### \n")
+    active = True
+    while (active):
+        active = prompt()
+        print("")
+        print("###################################### \n")
     print("Have a good day!")
