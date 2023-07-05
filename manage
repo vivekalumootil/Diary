@@ -19,7 +19,13 @@ def dash_year(s):
     return day + '-' + str(m) + '-' + year  
         
 def prompt():
-    print("You have three options. You may (1) read an entry, (2) add a new entry, (3) see the dates of all current entries, (4) delete an entry, (5) cleanse the entire system or (6) exit")
+    print("You have six options. You may: ")
+    print("1. read an entry")
+    print("2. add a new entry")
+    print("3. see the dates of all current entries")
+    print("4. delete an entry")
+    print("5. cleanse the entire system")
+    print("6. exit \n")
     print("Option: ", end="")
     choice = int(input())
     print("")
@@ -44,7 +50,7 @@ def prompt():
             print("Sorry, we cannot find this entry.")
 
     if (choice == 2):
-        print("Please enter the date (Month Day(th), Year) of the entry you would like to add. Note the file name should be this + .txt.")
+        print("Please enter the date (Month Day(th), Year) of the entry you would like to add. Note the file name should be this Day-Month-Year.txt.")
         print("Date: ", end = "")
         dt = input()
         dt = dash_year(dt)
